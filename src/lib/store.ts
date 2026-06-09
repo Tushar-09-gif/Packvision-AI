@@ -85,6 +85,7 @@ export const useAppStore = create<AppState>()(
           set((s) => ({ products: [product, ...s.products] }));
           get().addActivityLog({
             id: `AL-${Date.now()}`,
+            userId: get().user?.id || 'System',
             userName: get().user?.name || 'System',
             action: 'created product',
             target: product.code,
@@ -108,6 +109,7 @@ export const useAppStore = create<AppState>()(
           const pCode = updates.code || get().products.find(p => p.id === id)?.code || id;
           get().addActivityLog({
             id: `AL-${Date.now()}`,
+            userId: get().user?.id || 'System',
             userName: get().user?.name || 'System',
             action: 'updated product',
             target: pCode,
@@ -127,6 +129,7 @@ export const useAppStore = create<AppState>()(
           }));
           get().addActivityLog({
             id: `AL-${Date.now()}`,
+            userId: get().user?.id || 'System',
             userName: get().user?.name || 'System',
             action: 'deleted product',
             target: pCode,

@@ -94,8 +94,9 @@ export default function WorkerLayout({ children }: { children: React.ReactNode }
   if (!mounted) return null;
 
   const handleEnter = (name: string) => {
+    const newId = `W-${Date.now()}`;
     setUser({
-      id: `W-${Date.now()}`,
+      id: newId,
       name,
       role: 'worker',
       avatar: name[0].toUpperCase(),
@@ -103,6 +104,7 @@ export default function WorkerLayout({ children }: { children: React.ReactNode }
     });
     addActivityLog({
       id: `AL-${Date.now()}`,
+      userId: newId,
       userName: name,
       action: 'logged in to',
       target: 'Worker Panel',
