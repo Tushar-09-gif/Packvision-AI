@@ -11,8 +11,8 @@ export default function AnalyticsPage() {
 
   const m = useMemo(() => {
     const totalScans = recognitionLogs.length;
-    const successfulScans = recognitionLogs.filter(l => l.success).length;
-    const uniqueProducts = new Set(recognitionLogs.filter(l => l.matchedProductId).map(l => l.matchedProductId)).size;
+    const successfulScans = recognitionLogs.filter(l => l.matched).length;
+    const uniqueProducts = new Set(recognitionLogs.filter(l => l.productId).map(l => l.productId)).size;
     const accuracy = totalScans > 0 ? ((successfulScans / totalScans) * 100).toFixed(1) : '0.0';
     
     // Weekly data (Mon-Sun)
@@ -30,16 +30,16 @@ export default function AnalyticsPage() {
       const date = new Date(log.timestamp);
       const dayIdx = getDayIndex(date.getDay());
       weekStats[dayIdx].scans++;
-      if (log.success) weekStats[dayIdx].matches++;
+      if (log.matched) weekStats[dayIdx].matches++;
 
       hourStats[date.getHours()]++;
 
       if (!workerStats[log.userName]) workerStats[log.userName] = { scans: 0, matches: 0, avatar: log.userName.charAt(0).toUpperCase() };
       workerStats[log.userName].scans++;
-      if (log.success) workerStats[log.userName].matches++;
+      if (log.matched) workerStats[log.userName].matches++;
 
-      if (log.matchedProductId) {
-        const product = products.find(p => p.id === log.matchedProductId);
+      if (log.productId) {
+        const product = products.find(p => p.id === log.productId);
         const cat = product?.category || 'Uncategorized';
         if (!catStats[cat]) catStats[cat] = { scans: 0 };
         catStats[cat].scans++;
