@@ -22,7 +22,7 @@ export default function LandingPage() {
     ],
     founderQuote: "This system transformed how our team identifies and handles products. What used to take 10 minutes of explanation now takes 2 seconds.",
     founderName: "Tushar Makwana",
-    founderTitle: "Founder & Product Lead · AnticBuddy"
+    founderTitle: "Founder & Product Lead · PackVision AI"
   };
 
   const formattedTitle = c.heroTitle.split('\\n').map((line, i) => (
@@ -53,7 +53,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 16px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--gradient-brand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 18, color: 'white' }}>A</div>
-            <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em' }}>AnticBuddy</span>
+            <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em' }}>PackVision AI</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <Link href="/login" style={{ padding: '8px 16px', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Sign In</Link>
@@ -187,7 +187,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             <motion.h2 variants={fadeUp} style={{ fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 24 }}>Ready to Transform<br />Your Operations?</motion.h2>
-            <motion.p variants={fadeUp} style={{ fontSize: 18, color: 'var(--text-secondary)', marginBottom: 48, lineHeight: 1.6 }}>Start managing products smarter. Train teams faster. Eliminate manual confusion forever with AnticBuddy.</motion.p>
+            <motion.p variants={fadeUp} style={{ fontSize: 18, color: 'var(--text-secondary)', marginBottom: 48, lineHeight: 1.6 }}>Start managing products smarter. Train teams faster. Eliminate manual confusion forever with PackVision AI.</motion.p>
             <motion.div variants={fadeUp} style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
               <Link href="/login" className="btn-primary" style={{ padding: '18px 48px', fontSize: 16, borderRadius: 'var(--radius-full)', boxShadow: '0 10px 30px rgba(99,102,241,0.3)' }}>
                 Get Started Now <ChevronRight size={20} />
@@ -201,9 +201,9 @@ export default function LandingPage() {
       <footer style={{ padding: '60px 32px 40px', background: 'var(--bg-primary)', borderTop: '1px solid var(--surface-border)', textAlign: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 20 }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--gradient-brand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, color: 'white' }}>A</div>
-          <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em' }}>AnticBuddy</span>
+          <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em' }}>PackVision AI</span>
         </div>
-        <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>© {new Date().getFullYear()} AnticBuddy by Tushar Makwana. Enterprise Product Intelligence.</p>
+        <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>© {new Date().getFullYear()} PackVision AI by Tushar Makwana. Enterprise Product Intelligence.</p>
       </footer>
     </div>
   );

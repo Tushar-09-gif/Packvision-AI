@@ -2,7 +2,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Package, Grid3X3, BarChart3, Upload, Activity, Settings, LogOut, Menu, X, Sun, Moon, Camera, FileSpreadsheet } from 'lucide-react';
+import { LayoutDashboard, Package, Grid3X3, BarChart3, Upload, Activity, Settings, LogOut, Menu, X, Sun, Moon, Camera, FileSpreadsheet, BookOpen, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
@@ -28,8 +28,10 @@ const navGroups = [
     label: 'Tools',
     items: [
       { href: '/admin/recognition', label: 'AI Recognition', icon: Camera },
+      { href: '/admin/manual', label: 'Packaging Manual', icon: BookOpen },
+      { href: '/admin/questions', label: 'Worker Q&A', icon: MessageCircle },
       { href: '/admin/settings', label: 'Settings', icon: Settings },
-  { href: '/admin/page-editor', label: 'Page Editor', icon: Settings },
+      { href: '/admin/page-editor', label: 'Page Editor', icon: Settings },
     ],
   },
 ];
@@ -102,7 +104,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--gradient-brand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, color: 'white', flexShrink: 0 }}>A</div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 14, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>AnticBuddy</div>
+              <div style={{ fontWeight: 700, fontSize: 14, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>PackVision AI</div>
               <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Admin Panel</div>
             </div>
           </div>
@@ -147,9 +149,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div style={{ height: 1, background: 'var(--surface-border)', margin: '12px 8px' }} />
         <div style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 'var(--radius-full)', background: 'var(--gradient-brand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13, color: 'white' }}>{user?.avatar || 'A'}</div>
+          <div style={{ width: 32, height: 32, borderRadius: 'var(--radius-full)', background: 'var(--gradient-brand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13, color: 'white' }}>{user?.avatar || 'T'}</div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{user?.name || 'Admin'}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{user?.name || 'Tushar Makwana'}</div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Admin</div>
           </div>
         </div>
@@ -167,13 +169,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 26, height: 26, borderRadius: 6, background: 'var(--gradient-brand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 12, color: 'white' }}>A</div>
-          <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: '-0.02em' }}>AnticBuddy</span>
+          <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: '-0.02em' }}>PackVision AI</span>
         </div>
         <div style={{ width: 28, height: 28, borderRadius: 'var(--radius-full)', background: 'var(--gradient-brand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 11, color: 'white' }}>{user?.avatar || 'A'}</div>
       </div>
 
       {/* Main Content */}
-      <main className="main-content" style={{ flex: 1, marginLeft: 'var(--sidebar-width)', padding: '32px 40px', minHeight: '100vh', overflow: 'auto' }}>
+      <main className="main-content" style={{ flex: 1, marginLeft: 'var(--sidebar-width)', padding: '32px 40px', minHeight: '100vh', overflow: 'auto', position: 'relative' }}>
         <div className="page-enter">
           {children}
         </div>
@@ -181,6 +183,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <style jsx>{`
         .sidebar-close-btn { display: none; }
+        @media (min-width: 769px) {
+          .desktop-only { display: block !important; }
+        }
         @media (max-width: 768px) {
           .sidebar-close-btn { display: block; }
           .sidebar {

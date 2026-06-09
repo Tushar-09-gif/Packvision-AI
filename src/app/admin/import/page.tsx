@@ -136,7 +136,7 @@ export default function CSVImportPage() {
     const blob = new Blob([template], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'anticbuddy-template.csv';
+    a.href = url; a.download = 'packvisionai-template.csv';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };

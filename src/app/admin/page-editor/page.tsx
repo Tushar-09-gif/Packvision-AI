@@ -21,7 +21,7 @@ export default function PageEditor() {
     ],
     founderQuote: "This system transformed how our team identifies and handles products. What used to take 10 minutes of explanation now takes 2 seconds.",
     founderName: "Tushar Makwana",
-    founderTitle: "Founder & Product Lead · AnticBuddy"
+    founderTitle: "Founder & Product Lead · PackVision AI"
   });
 
   useEffect(() => {

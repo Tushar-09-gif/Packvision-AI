@@ -3,13 +3,14 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { Home, Camera, Grid3X3, User, ArrowRight } from 'lucide-react';
+import { Home, Camera, Grid3X3, User, ArrowRight, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
 const navItems = [
   { href: '/worker', label: 'Home', icon: Home },
   { href: '/worker/scan', label: 'Scan', icon: Camera },
   { href: '/worker/catalog', label: 'Products', icon: Grid3X3 },
+  { href: '/worker/manual', label: 'Manual', icon: BookOpen },
 ];
 
 function WorkerNameGate({ onEnter }: { onEnter: (name: string) => void }) {
@@ -84,7 +85,7 @@ function WorkerNameGate({ onEnter }: { onEnter: (name: string) => void }) {
 export default function WorkerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   // Use Zustand persisted state directly — no sessionStorage conflict
-  const { user, setUser, theme } = useAppStore();
+  const { user, setUser, theme, addActivityLog } = useAppStore();
 
   const workerName = user?.name || null;
   const [mounted, setMounted] = useState(false);
@@ -99,6 +100,14 @@ export default function WorkerLayout({ children }: { children: React.ReactNode }
       role: 'worker',
       avatar: name[0].toUpperCase(),
       email: '',
+    });
+    addActivityLog({
+      id: `AL-${Date.now()}`,
+      userName: name,
+      action: 'logged in to',
+      target: 'Worker Panel',
+      timestamp: new Date().toISOString(),
+      type: 'login',
     });
   };
 
@@ -134,7 +143,7 @@ export default function WorkerLayout({ children }: { children: React.ReactNode }
             alignItems: 'center', justifyContent: 'center',
             fontWeight: 800, fontSize: 13, color: 'white',
           }}>A</div>
-          <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: '-0.02em' }}>AnticBuddy</span>
+          <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: '-0.02em' }}>PackVision AI</span>
           <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>Worker</span>
         </div>
 

@@ -1,17 +1,49 @@
 'use client';
 import { motion } from 'framer-motion';
-import { Package, TrendingUp, Activity, Plus, FileSpreadsheet, Layers, Tag, CheckCircle, Clock, BarChart3 } from 'lucide-react';
+import { Package, TrendingUp, Activity, Plus, FileSpreadsheet, Layers, Tag, CheckCircle, Clock, BarChart3, Edit2 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import Link from 'next/link';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+function InlineCategoryRename({ oldName, onRename }: { oldName: string, onRename: (o: string, n: string) => void }) {
+  const [val, setVal] = useState(oldName);
+  const [editing, setEditing] = useState(false);
+  
+  const handleBlur = () => {
+    setEditing(false);
+    if (val.trim() && val.trim() !== oldName) onRename(oldName, val.trim());
+  };
+
+  if (editing) {
+    return <input autoFocus value={val} onChange={e => setVal(e.target.value)} onBlur={handleBlur} onKeyDown={e => e.key === 'Enter' && handleBlur()} style={{ height: 20, padding: '0 4px', fontSize: 12, width: 100, border: '1px solid var(--accent)', borderRadius: 4, background: 'var(--bg-primary)', color: 'var(--text-primary)' }} />;
+  }
+
+  return (
+    <span onClick={() => setEditing(true)} title="Click to rename everywhere" style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+      {oldName || <i style={{color: 'var(--text-muted)'}}>Uncategorized</i>}
+      <Edit2 size={10} style={{ opacity: 0.3 }} />
+    </span>
+  );
+}
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
 export default function AdminDashboard() {
-  const { products, activityLogs, user, fetchData } = useAppStore();
+  const { products, activityLogs, user, fetchData, updateProduct } = useAppStore();
+  const [renaming, setRenaming] = useState(false);
 
   useEffect(() => { fetchData(); }, []);
+
+  const handleRenameCategory = async (oldName: string, newName: string) => {
+    setRenaming(true);
+    const targets = products.filter(p => p.category === oldName);
+    for (const p of targets) {
+      await updateProduct(p.id, { category: newName });
+    }
+    await fetchData();
+    setRenaming(false);
+  };
 
   const totalProducts = products.length;
   const activeProducts = products.filter(p => p.status === 'active').length;
@@ -50,7 +82,7 @@ export default function AdminDashboard() {
           <h1 className="page-title">Dashboard</h1>
           <span className="badge badge-success" style={{ fontSize: 11 }}>Live</span>
         </div>
-        <p className="page-subtitle">Welcome back, {user?.name || 'Admin'}. Here&apos;s your system overview.</p>
+        <p className="page-subtitle">Welcome back, {user?.name || 'Tushar Makwana'}. Here&apos;s your system overview.</p>
       </div>
 
       {/* Stats Grid */}
@@ -137,7 +169,9 @@ export default function AdminDashboard() {
                 <div key={name} style={{ marginBottom: 14 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
                     <span style={{ fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ width: 8, height: 8, borderRadius: 2, background: color, display: 'inline-block' }} />{name}
+                      <span style={{ width: 8, height: 8, borderRadius: 2, background: color, display: 'inline-block' }} />
+                      <InlineCategoryRename oldName={name} onRename={handleRenameCategory} />
+                      {renaming && <span style={{fontSize:10, color:'var(--text-muted)'}}>(saving...)</span>}
                     </span>
                     <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{count}</span>
                   </div>

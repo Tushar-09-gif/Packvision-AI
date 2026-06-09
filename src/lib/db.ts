@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import fs from 'fs/promises';
 import path from 'path';
-import { Product, ActivityLog, RecognitionLog, LandingContent } from '@/types';
+import { Product, ActivityLog, RecognitionLog, LandingContent, Question } from '@/types';
 
 // ─── SCHEMAS ────────────────────────────────────────────────────────────────
 
@@ -46,6 +46,18 @@ const RecognitionLogSchema = new mongoose.Schema({
 export const ProductModel = mongoose.models.Product || mongoose.model('Product', ProductSchema);
 export const ActivityLogModel = mongoose.models.ActivityLog || mongoose.model('ActivityLog', ActivityLogSchema);
 export const RecognitionLogModel = mongoose.models.RecognitionLog || mongoose.model('RecognitionLog', RecognitionLogSchema);
+
+const QuestionSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  userId: String,
+  userName: String,
+  question: String,
+  answer: { type: String, default: null },
+  status: { type: String, default: 'pending' },
+  timestamp: String,
+  answeredAt: { type: String, default: null },
+});
+export const QuestionModel = mongoose.models.Question || mongoose.model('Question', QuestionSchema);
 
 const LandingContentSchema = new mongoose.Schema({
   id: { type: String, default: 'landing_singleton', unique: true },
@@ -98,10 +110,10 @@ const defaultLandingContent: LandingContent = {
   ],
   founderQuote: "This system transformed how our team identifies and handles products. What used to take 10 minutes of explanation now takes 2 seconds.",
   founderName: "Tushar Makwana",
-  founderTitle: "Founder & Product Lead · AnticBuddy"
+  founderTitle: "Founder & Product Lead · PackVision AI"
 };
 
-const defaultData = { products: [] as Product[], activityLogs: [] as ActivityLog[], recognitionLogs: [] as RecognitionLog[], landingContent: defaultLandingContent };
+const defaultData = { products: [] as Product[], activityLogs: [] as ActivityLog[], recognitionLogs: [] as RecognitionLog[], questions: [] as Question[], landingContent: defaultLandingContent };
 
 async function readJson() {
   try {
@@ -135,6 +147,10 @@ export interface DbHelpers {
 
   getLandingContent(): Promise<LandingContent>;
   updateLandingContent(content: LandingContent): Promise<void>;
+
+  getQuestions(): Promise<Question[]>;
+  insertQuestion(q: Question): Promise<void>;
+  updateQuestion(id: string, updates: Partial<Question>): Promise<Question | null>;
 }
 
 function stripMongo(doc: any): any {
@@ -202,6 +218,17 @@ export async function getDb(): Promise<DbHelpers> {
           { ...content },
           { upsert: true, new: true }
         );
+      },
+      async getQuestions() {
+        const docs = await QuestionModel.find({}).sort({ timestamp: -1 }).lean();
+        return docs.map(stripMongo);
+      },
+      async insertQuestion(q) {
+        await QuestionModel.create(q);
+      },
+      async updateQuestion(id, updates) {
+        const doc = await QuestionModel.findOneAndUpdate({ id }, updates, { new: true }).lean();
+        return doc ? stripMongo(doc) : null;
       },
     };
   } else {
@@ -284,6 +311,23 @@ export async function getDb(): Promise<DbHelpers> {
         const db = await readJson();
         db.landingContent = content;
         await writeJson(db);
+      },
+      async getQuestions() {
+        const db = await readJson();
+        return db.questions || [];
+      },
+      async insertQuestion(q) {
+        const db = await readJson();
+        db.questions = [q, ...(db.questions || [])];
+        await writeJson(db);
+      },
+      async updateQuestion(id, updates) {
+        const db = await readJson();
+        const idx = (db.questions || []).findIndex((q: Question) => q.id === id);
+        if (idx === -1) return null;
+        db.questions[idx] = { ...db.questions[idx], ...updates };
+        await writeJson(db);
+        return db.questions[idx];
       },
     };
   }

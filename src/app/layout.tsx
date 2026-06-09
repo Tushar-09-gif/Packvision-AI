@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AnticBuddy — Intelligent Product Recognition & Management",
+  title: "PackVision AI — Intelligent Product Recognition & Management",
   description: "Built to simplify operations, train teams faster, and eliminate manual confusion. By Tushar Makwana.",
 };
 

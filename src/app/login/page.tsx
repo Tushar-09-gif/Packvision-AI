@@ -5,8 +5,8 @@ import { Shield, HardHat, ArrowRight, Eye, EyeOff, Zap, AlertCircle, User } from
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 
-const ADMIN_EMAIL = 'admin@anticbuddy.com';
-const ADMIN_PASSWORD = 'anticbuddy@123';
+const ADMIN_EMAIL = 'admin@packvisionai.com';
+const ADMIN_PASSWORD = 'packvisionai@123';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -56,7 +56,7 @@ export default function LoginPage() {
           {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 40 }}>
             <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--gradient-brand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 18, color: 'white' }}>A</div>
-            <span style={{ fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>AnticBuddy</span>
+            <span style={{ fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>PackVision AI</span>
           </div>
 
           <h1 style={{ fontSize: 'clamp(22px,4vw,32px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 6 }}>
@@ -95,7 +95,7 @@ export default function LoginPage() {
               <motion.form key="admin" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} onSubmit={handleAdminLogin}>
                 <div className="float-label" style={{ marginBottom: 14 }}>
                   <label>Email Address</label>
-                  <input id="admin-email" className="input-field" type="email" placeholder="admin@anticbuddy.com" required value={email} onChange={e => setEmail(e.target.value)} />
+                  <input id="admin-email" className="input-field" type="email" placeholder="admin@packvisionai.com" required value={email} onChange={e => setEmail(e.target.value)} />
                 </div>
                 <div className="float-label" style={{ marginBottom: 24 }}>
                   <label>Password</label>

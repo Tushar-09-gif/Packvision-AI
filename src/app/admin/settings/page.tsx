@@ -8,9 +8,9 @@ export default function SettingsPage() {
   const { theme, toggleTheme } = useAppStore();
   const [saved, setSaved] = useState(false);
   const [settings, setSettings] = useState({
-    companyName: 'AnticBuddy Industries',
+    companyName: 'PackVision AI Industries',
     managerName: 'Tushar Makwana',
-    email: 'tushar@anticbuddy.com',
+    email: 'tushar@packvisionai.com',
     language: 'English',
     notifications: true,
     emailAlerts: true,

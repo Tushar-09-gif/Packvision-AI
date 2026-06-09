@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 
 export default function WorkerDashboard() {
-  const { products, recognitionLogs } = useAppStore();
+  const { products, recognitionLogs, user } = useAppStore();
   const recentScans = recognitionLogs.slice(0, 3);
+  const workerName = user?.name || 'Worker';
 
   return (
     <div>
@@ -14,7 +15,7 @@ export default function WorkerDashboard() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         style={{ marginBottom: 28, padding: 24, borderRadius: 'var(--radius-lg)', background: 'var(--gradient-brand)', color: 'white', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 6 }}>Welcome, Worker 👋</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 6 }}>Welcome, {workerName} 👋</h1>
           <p style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.5 }}>Scan any product to instantly get its details, instructions, and packaging info.</p>
         </div>
         <div style={{ position: 'absolute', right: -20, bottom: -20, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />

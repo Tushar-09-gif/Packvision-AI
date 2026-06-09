@@ -101,3 +101,14 @@ export interface PaginationState {
   limit: number;
   total: number;
 }
+
+export interface Question {
+  id: string;
+  userId: string;
+  userName: string;
+  question: string;
+  answer: string | null;
+  status: 'pending' | 'answered';
+  timestamp: string;
+  answeredAt: string | null;
+}

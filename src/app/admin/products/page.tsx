@@ -1,5 +1,6 @@
 'use client';
 import { useState, useMemo, useRef, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Plus, Edit2, Trash2, Eye, Package, X, Upload,
@@ -36,7 +37,7 @@ function exportToCSV(products: Product[]) {
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = `anticbuddy-products-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.href = url; a.download = `packvisionai-products-${new Date().toISOString().slice(0, 10)}.csv`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
@@ -54,10 +55,47 @@ function statusColor(s: string) {
   return s === 'active' ? 'badge-success' : s === 'draft' ? 'badge-warning' : 'badge-danger';
 }
 
+function InlineCategoryEdit({ product, onSave }: { product: Product, onSave: (id: string, cat: string) => void }) {
+  const [val, setVal] = useState(product.category || '');
+  const [editing, setEditing] = useState(false);
+  
+  const handleBlur = () => {
+    setEditing(false);
+    if (val.trim() !== product.category) onSave(product.id, val.trim());
+  };
+
+  if (editing) {
+    return (
+      <input 
+        autoFocus 
+        value={val} 
+        onChange={e => setVal(e.target.value)} 
+        onBlur={handleBlur} 
+        onKeyDown={e => e.key === 'Enter' && handleBlur()} 
+        style={{ height: 26, padding: '0 6px', fontSize: 12, width: 120, border: '1px solid var(--accent)', borderRadius: 4, background: 'var(--bg-primary)', color: 'var(--text-primary)' }} 
+      />
+    );
+  }
+
+  return (
+    <span 
+      onClick={() => setEditing(true)} 
+      title="Click to edit"
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer', padding: '4px 6px', borderRadius: 4, background: 'var(--bg-glass)' }}
+    >
+      <Layers size={12} color="var(--text-muted)" />
+      {product.category || <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Uncategorized</span>}
+      <Edit2 size={10} style={{ opacity: 0.3, marginLeft: 4 }} />
+    </span>
+  );
+}
+
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function ProductsPage() {
   const { products, deleteProduct, updateProduct, addProduct, fetchData, user } = useAppStore();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   // Filter/sort/page state
   const [search, setSearch] = useState('');
@@ -81,6 +119,26 @@ export default function ProductsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { fetchData(); }, []);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      const viewId = searchParams.get('view');
+      const editId = searchParams.get('edit');
+      if (viewId) {
+        const p = products.find(p => p.id === viewId);
+        if (p) {
+          setViewProduct(p);
+          router.replace('/admin/products');
+        }
+      } else if (editId) {
+        const p = products.find(p => p.id === editId);
+        if (p) {
+          openEdit(p);
+          router.replace('/admin/products');
+        }
+      }
+    }
+  }, [searchParams, products, router]);
 
   const categories = useMemo(() => {
     const cats = new Set<string>();
@@ -299,9 +357,7 @@ export default function ProductsPage() {
                   </td>
                   <td><code style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-hover)', background: 'var(--accent-subtle)', padding: '2px 8px', borderRadius: 4 }}>{p.code}</code></td>
                   <td style={{ fontSize: 13 }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <Layers size={12} color="var(--text-muted)" />{p.category || '—'}
-                    </span>
+                    <InlineCategoryEdit product={p} onSave={(id, cat) => updateProduct(id, { category: cat })} />
                   </td>
                   <td><span className={`badge ${statusColor(p.status)}`}>{p.status}</span></td>
                   <td>

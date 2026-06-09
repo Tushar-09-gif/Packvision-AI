@@ -6,21 +6,21 @@ export const dynamic = 'force-dynamic';
 
 function mapCSVHeaderToField(header: string): string {
   const h = header.toLowerCase().replace(/[^a-z0-9]/g, '');
-  if (['sku', 'productcode', 'code', 'srno', 'materialcode'].includes(h)) return 'code';
-  if (['productname', 'name', 'itemname', 'materialdescription', 'description'].includes(h)) return 'name';
-  if (['shortname', 'shortdesc', 'short'].includes(h)) return 'shortName';
-  if (['brand', 'variant', 'brandvariant'].includes(h)) return 'brand';
+  if (['sku', 'productcode', 'code', 'srno', 'materialcode', 'skucode', 'itemcode', 'barcode'].includes(h) || h.includes('sku') || h.includes('code')) return 'code';
+  if (['productname', 'name', 'itemname', 'materialdescription', 'description', 'title'].includes(h) || (h.includes('name') && !h.includes('short'))) return 'name';
+  if (['shortname', 'shortdesc', 'short'].includes(h) || h.includes('shortname')) return 'shortName';
+  if (['brand', 'variant', 'brandvariant'].includes(h) || h.includes('brand')) return 'brand';
   if (['size', 'qty', 'volume', 'weight'].includes(h)) return 'size';
-  if (['unit', 'uom'].includes(h)) return 'unit';
-  if (['category', 'cat', 'type', 'producttype'].includes(h)) return 'category';
+  if (['unit', 'uom', 'measure'].includes(h)) return 'unit';
+  if (['category', 'cat', 'type', 'producttype'].includes(h) || h.includes('category')) return 'category';
   if (['desc', 'notes', 'materialdesc'].includes(h)) return 'description';
-  if (['price', 'mrp', 'cost'].includes(h)) return 'price';
-  if (['stock', 'quantity', 'qtyinstock', 'noofqty', 'noofqtyindone'].includes(h)) return 'stock';
-  if (['status', 'state', 'donepending'].includes(h)) return 'status';
-  if (['imageurl', 'image', 'photo', 'img'].includes(h)) return 'image';
-  if (['bottletype', 'bottle', 'packaging', 'bottletypepethdpealucoex'].includes(h)) return 'bottleType';
-  if (['labelsize', 'labeltype', 'label'].includes(h)) return 'labelSize';
-  if (['cfbsize', 'cfb'].includes(h)) return 'cfbSize';
+  if (['price', 'mrp', 'cost'].includes(h) || h.includes('price')) return 'price';
+  if (['stock', 'quantity', 'qtyinstock', 'noofqty', 'noofqtyindone'].includes(h) || h.includes('stock')) return 'stock';
+  if (['status', 'state', 'donepending'].includes(h) || h.includes('status')) return 'status';
+  if (['imageurl', 'image', 'photo', 'img'].includes(h) || h.includes('image')) return 'image';
+  if (['bottletype', 'bottle', 'packaging', 'bottletypepethdpealucoex'].includes(h) || h.includes('bottle')) return 'bottleType';
+  if (['labelsize', 'labeltype', 'label'].includes(h) || h.includes('label')) return 'labelSize';
+  if (['cfbsize', 'cfb'].includes(h) || h.includes('cfb')) return 'cfbSize';
   return h;
 }
 

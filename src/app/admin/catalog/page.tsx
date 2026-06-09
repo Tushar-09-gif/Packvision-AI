@@ -1,7 +1,8 @@
 'use client';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Grid3X3, List, Package, Tag, Box, Droplets, Pill } from 'lucide-react';
+import { Search, Grid3X3, List, Package, Tag, Box, Droplets, Pill, Eye, Edit2 } from 'lucide-react';
+import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 
 const catIcons: Record<string, React.ElementType> = { 'Beverages': Droplets, 'Home Care': Box, 'Personal Care': Pill, 'Food & Pantry': Tag };
@@ -97,11 +98,16 @@ export default function CatalogPage() {
 
                   <code style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', display: 'block', marginBottom: 12 }}>{p.code}</code>
 
-                    <div><span style={{ color: 'var(--text-muted)' }}>Price:</span> <span style={{ fontWeight: 600 }}>${p.price?.toFixed(2)}</span></div>
+                    <div><span style={{ color: 'var(--text-muted)' }}>Price:</span> <span style={{ fontWeight: 600 }}>₹{p.price?.toFixed(2)}</span></div>
                     <div><span style={{ color: 'var(--text-muted)' }}>Stock:</span> <span style={{ fontWeight: 700, color }}>{p.stock}</span></div>
 
                   <div style={{ marginTop: 12, padding: '8px 12px', background: 'var(--bg-glass)', borderRadius: 'var(--radius-sm)', fontSize: 11, color: 'var(--text-muted)' }}>
-                    📦 {p.packagingType}
+                    📦 {p.packagingType || 'N/A'}
+                  </div>
+
+                  <div style={{ marginTop: 12, display: 'flex', gap: 8, borderTop: '1px solid var(--surface-border)', paddingTop: 12 }}>
+                    <Link href={`/admin/products?view=${p.id}`} className="btn-secondary" style={{ flex: 1, padding: '6px', fontSize: 12, justifyContent: 'center' }}><Eye size={14}/> View</Link>
+                    <Link href={`/admin/products?edit=${p.id}`} className="btn-primary" style={{ flex: 1, padding: '6px', fontSize: 12, justifyContent: 'center' }}><Edit2 size={14}/> Edit</Link>
                   </div>
                 </div>
               ) : (
@@ -118,6 +124,10 @@ export default function CatalogPage() {
                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>in stock</div>
                   </div>
                   <span className="badge badge-success" style={{ fontSize: 11 }}>{p.status}</span>
+                  <div style={{ display: 'flex', gap: 6, marginLeft: 16 }}>
+                    <Link href={`/admin/products?view=${p.id}`} className="btn-secondary" style={{ padding: '6px 10px', fontSize: 12 }}><Eye size={14}/></Link>
+                    <Link href={`/admin/products?edit=${p.id}`} className="btn-primary" style={{ padding: '6px 10px', fontSize: 12 }}><Edit2 size={14}/></Link>
+                  </div>
                 </div>
               )}
             </motion.div>
