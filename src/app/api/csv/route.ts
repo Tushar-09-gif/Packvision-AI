@@ -73,10 +73,11 @@ export async function POST(req: Request) {
           row[key] = values[idx]?.trim() || '';
         });
 
-        const code = row.code || row.sku || `AUTO-${Date.now()}-${i}`;
+        const code = row.code || row.sku || '';
         const name = row.name || row.productname || '';
         
-        if (!name && !code) { errors.push(`Row ${i + 1}: Missing name and code`); continue; }
+        if (!code) { errors.push(`Row ${i + 1}: Missing SKU code in CSV`); continue; }
+        if (!name) { errors.push(`Row ${i + 1}: Missing product name in CSV`); continue; }
         if (codesToImport.has(code)) { skipped.push(code); continue; }
 
         const isCocreate = row.brand?.toUpperCase() === 'COCREATE' || name.toUpperCase().includes('COCREATE');
@@ -90,7 +91,7 @@ export async function POST(req: Request) {
         if (isCocreate) tags.push('Co-Create');
 
         const product: Product = {
-          id: `PRD-${code}`,
+          id: code,
           name,
           code,
           category: row.category || 'Uncategorized',
