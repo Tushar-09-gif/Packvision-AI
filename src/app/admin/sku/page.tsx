@@ -5,7 +5,7 @@ import { useAppStore } from '@/lib/store';
 import { FileSpreadsheet, Search, Upload, AlertCircle, CheckCircle, Package } from 'lucide-react';
 
 export default function SKUManagementPage() {
-  const { products, fetchData } = useAppStore();
+  const { products, fetchData, updateProduct, deleteProduct } = useAppStore();
   const [search, setSearch] = useState('');
   
   // File Upload State
@@ -39,7 +39,7 @@ export default function SKUManagementPage() {
       }
       
       setResult(data);
-      fetchData(); // Refresh products in global store
+      await fetchData(); // Refresh products in global store
     } catch (err: any) {
       setError(err.message || 'Network error during upload');
     } finally {
@@ -71,29 +71,27 @@ export default function SKUManagementPage() {
     if (!editingProduct) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/products/${editingProduct.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          code: editForm.code,
-          name: editForm.name,
-          packagingType: editForm.packagingType,
-          bottleType: editForm.bottleType,
-          color: editForm.color,
-          subcategory: editForm.subcategory,
-          cfbSize: editForm.cfbSize,
-          quantity: parseInt(editForm.quantity) || 0,
-        })
+      await updateProduct(editingProduct.id, {
+        code: editForm.code,
+        name: editForm.name,
+        packagingType: editForm.packagingType,
+        bottleType: editForm.bottleType,
+        color: editForm.color,
+        subcategory: editForm.subcategory,
+        cfbSize: editForm.cfbSize,
+        quantity: parseInt(editForm.quantity) || 0,
       });
-
-      if (!res.ok) throw new Error('Failed to update SKU');
-      
-      await fetchData(); // Refresh data
       setEditingProduct(null);
     } catch (err: any) {
       alert(err.message || 'Error updating SKU');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this SKU?')) {
+      await deleteProduct(id);
     }
   };
 
@@ -225,13 +223,22 @@ export default function SKUManagementPage() {
                     <td style={{ padding: '14px 20px' }}>{cfbSize}</td>
                     <td style={{ padding: '14px 20px' }}>{qtyCfb}</td>
                     <td style={{ padding: '14px 20px', textAlign: 'right' }}>
-                      <button 
-                        onClick={() => startEdit(p)}
-                        className="btn-secondary" 
-                        style={{ padding: '4px 12px', fontSize: 12 }}
-                      >
-                        Edit
-                      </button>
+                      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                        <button 
+                          onClick={() => startEdit(p)}
+                          className="btn-secondary" 
+                          style={{ padding: '4px 12px', fontSize: 12 }}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(p.id)}
+                          className="btn-secondary" 
+                          style={{ padding: '4px 12px', fontSize: 12, color: '#ef4444', borderColor: 'rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.05)' }}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </motion.tr>
                 );
