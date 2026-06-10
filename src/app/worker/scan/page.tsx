@@ -80,51 +80,20 @@ export default function ScanPage() {
       ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
       const base64Image = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
 
-      // 2. Prepare API call
-      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error('AI recognition failed: API key missing. Please configure NEXT_PUBLIC_GEMINI_API_KEY in your environment variables.');
-      }
-
-      const productList = products.map(p => `ID: ${p.id}, Name: ${p.name}, Code: ${p.code}`).join('\n');
-      const prompt = `You are a product recognition AI. I will provide an image of a product and a list of known products. 
-Identify the product from the list that best matches the image.
-Return ONLY a JSON object with the exact format: {"id": "matched_id", "confidence": 95}
-If no product matches, return {"id": null, "confidence": 0}
-
-Known products:
-${productList}`;
-
-      // 3. Call Gemini API
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      // 2. Call our secure backend API route
+      const response = await fetch('/api/recognition/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: prompt },
-              { inline_data: { mime_type: 'image/jpeg', data: base64Image } }
-            ]
-          }],
-          generationConfig: { response_mime_type: "application/json" }
-        })
+        body: JSON.stringify({ base64Image })
       });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`API error (${response.status}): ${errText}`);
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to scan product');
       }
 
-      const data = await response.json();
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      
-      let aiResult;
-      try {
-        aiResult = JSON.parse(rawText || '{}');
-      } catch (e) {
-        console.error("Failed to parse AI response:", rawText);
-        throw new Error("Invalid response format from AI");
-      }
+      const aiResult = data.aiResult;
 
       const workerName = user?.name || 'Worker';
 
