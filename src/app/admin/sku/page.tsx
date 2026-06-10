@@ -57,7 +57,7 @@ export default function SKUManagementPage() {
     setEditingProduct(p);
     setEditForm({
       code: p.code,
-      brand: p.brand || p.specifications?.Brand || '',
+      name: p.name,
       packagingType: p.packagingType || p.size || p.specifications?.Size || '',
       bottleType: p.bottleType || p.specifications?.['Bottle Type'] || '',
       color: p.color || p.specifications?.Color || '',
@@ -76,7 +76,7 @@ export default function SKUManagementPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code: editForm.code,
-          brand: editForm.brand,
+          name: editForm.name,
           packagingType: editForm.packagingType,
           bottleType: editForm.bottleType,
           color: editForm.color,
@@ -179,7 +179,7 @@ export default function SKUManagementPage() {
           <thead>
             <tr style={{ borderBottom: '1px solid var(--surface-border)', background: 'var(--surface-hover)' }}>
               <th style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-secondary)' }}>Material Code</th>
-              <th style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-secondary)' }}>Brand Name</th>
+              <th style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-secondary)' }}>Product Name</th>
               <th style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-secondary)' }}>Pack Size</th>
               <th style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-secondary)' }}>Bottle Type</th>
               <th style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-secondary)' }}>Cap Colour</th>
@@ -217,7 +217,7 @@ export default function SKUManagementPage() {
                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                   >
                     <td style={{ padding: '14px 20px', fontWeight: 600 }}>{p.code}</td>
-                    <td style={{ padding: '14px 20px' }}>{p.brand || p.specifications?.Brand || '-'}</td>
+                    <td style={{ padding: '14px 20px' }}>{p.name}</td>
                     <td style={{ padding: '14px 20px' }}>{packSize}</td>
                     <td style={{ padding: '14px 20px' }}>{bottleType}</td>
                     <td style={{ padding: '14px 20px' }}>{capColor}</td>
@@ -253,8 +253,8 @@ export default function SKUManagementPage() {
                 <input type="text" className="form-input" value={editForm.code} onChange={e => setEditForm({...editForm, code: e.target.value})} />
               </div>
               <div>
-                <label className="form-label">Brand Name</label>
-                <input type="text" className="form-input" value={editForm.brand} onChange={e => setEditForm({...editForm, brand: e.target.value})} />
+                <label className="form-label">Product Name</label>
+                <input type="text" className="form-input" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
               </div>
               <div>
                 <label className="form-label">Pack Size</label>
