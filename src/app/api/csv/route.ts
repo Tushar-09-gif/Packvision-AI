@@ -88,7 +88,7 @@ export async function POST(req: Request) {
         if (row.shortName) tags.push(row.shortName);
         if (row.brand && !['standard', 'cocreate'].includes(row.brand.toLowerCase())) tags.push(row.brand);
         if (row.category) tags.push(row.category);
-        if (isCocreate) tags.push('Co-Create');
+        if (isCocreate) tags.push('Cocreate');
 
         const product: Product = {
           id: code,

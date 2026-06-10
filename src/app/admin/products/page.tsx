@@ -26,7 +26,7 @@ const emptyProduct = (): EditableProduct => ({
 });
 
 function exportToCSV(products: Product[]) {
-  const headers = ['SKU', 'Name', 'Short Name', 'Brand', 'Size', 'Unit', 'Category', 'Description', 'Price', 'Stock', 'Status', 'Co-Create'];
+  const headers = ['SKU', 'Name', 'Short Name', 'Brand', 'Size', 'Unit', 'Category', 'Description', 'Price', 'Stock', 'Status', 'Cocreate'];
   const rows = products.map(p => [
     p.code, p.name, p.shortName || '', p.brand || '',
     p.size || p.specifications?.Size || '', p.unit || '',
@@ -272,7 +272,7 @@ export default function ProductsPage() {
         {[
           { label: 'Category', value: filterCategory, setter: setFilterCategory, options: categories },
           { label: 'Status', value: filterStatus, setter: setFilterStatus, options: ['All', 'active', 'discontinued', 'draft'] },
-          { label: 'Type', value: filterCocreate, setter: setFilterCocreate, options: [['All', 'All'], ['yes', 'Co-Create'], ['no', 'Standard']] as [string, string][] },
+          { label: 'Type', value: filterCocreate, setter: setFilterCocreate, options: [['All', 'All'], ['yes', 'Cocreate'], ['no', 'Standard']] as [string, string][] },
         ].map(({ label, value, setter, options }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg-glass)', border: '1px solid var(--surface-border)', padding: '0 12px', borderRadius: 'var(--radius-md)', height: 38 }}>
             <Filter size={13} color="var(--text-muted)" />
@@ -362,7 +362,7 @@ export default function ProductsPage() {
                   <td><span className={`badge ${statusColor(p.status)}`}>{p.status}</span></td>
                   <td>
                     {p.isCocreate
-                      ? <span className="badge badge-accent" style={{ fontSize: 10 }}><Tag size={9} style={{ marginRight: 3 }} />Co-Create</span>
+                      ? <span className="badge badge-accent" style={{ fontSize: 10 }}><Tag size={9} style={{ marginRight: 3 }} />Cocreate</span>
                       : <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Standard</span>
                     }
                   </td>
@@ -505,7 +505,7 @@ export default function ProductsPage() {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
               <input type="checkbox" id="cocreate-cb" checked={editProduct.isCocreate} onChange={e => setEditProduct(p => ({ ...p, isCocreate: e.target.checked }))} style={{ width: 16, height: 16, accentColor: 'var(--accent)' }} />
-              <label htmlFor="cocreate-cb" style={{ fontSize: 13, cursor: 'pointer', color: 'var(--text-secondary)' }}>Co-Create Product</label>
+              <label htmlFor="cocreate-cb" style={{ fontSize: 13, cursor: 'pointer', color: 'var(--text-secondary)' }}>Cocreate Product</label>
             </div>
 
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
@@ -540,7 +540,7 @@ export default function ProductsPage() {
               {[
                 ['Category', viewProduct.category], ['Short Name', viewProduct.shortName || '—'],
                 ['Brand', viewProduct.brand || '—'], ['Size', viewProduct.size ? `${viewProduct.size} ${viewProduct.unit || ''}` : (viewProduct.specifications?.Size || '—')],
-                ['Status', viewProduct.status], ['Type', viewProduct.isCocreate ? 'Co-Create' : 'Standard'],
+                ['Status', viewProduct.status], ['Type', viewProduct.isCocreate ? 'Cocreate' : 'Standard'],
               ].map(([label, val]) => (
                 <div key={label} style={{ padding: '10px 12px', background: 'var(--bg-primary)', borderRadius: 8, border: '1px solid var(--surface-border)' }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 3 }}>{label}</div>

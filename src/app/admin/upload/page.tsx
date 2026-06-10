@@ -165,7 +165,7 @@ export default function UploadPage() {
 
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer', color: 'var(--text-secondary)', marginBottom: 20 }}>
               <input type="checkbox" checked={form.isCocreate} onChange={e => update('isCocreate', e.target.checked)} style={{ width: 16, height: 16, accentColor: 'var(--accent)' }} />
-              Co-Create Product
+              Cocreate Product
             </label>
 
             <button type="submit" disabled={saving} className="btn-primary" style={{ padding: '14px 32px', fontSize: 15, opacity: saving ? 0.7 : 1 }}>

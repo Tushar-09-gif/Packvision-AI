@@ -92,7 +92,7 @@ export default function CatalogPage() {
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
                     <h3 style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.3, flex: 1 }}>{p.name}</h3>
                     <span className={`badge ${p.isCocreate ? 'badge-accent' : 'badge-info'}`} style={{ marginLeft: 8, fontSize: 10, flexShrink: 0 }}>
-                      {p.isCocreate ? 'Co-Create' : 'Standard'}
+                      {p.isCocreate ? 'Cocreate' : 'Standard'}
                     </span>
                   </div>
 

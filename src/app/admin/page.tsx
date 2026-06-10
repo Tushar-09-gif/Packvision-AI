@@ -64,7 +64,7 @@ export default function AdminDashboard() {
     { label: 'Total Products', value: totalProducts, icon: Package, color: '#6366f1', bg: 'rgba(99,102,241,0.1)', href: '/admin/products' },
     { label: 'Active Products', value: activeProducts, icon: CheckCircle, color: '#22c55e', bg: 'rgba(34,197,94,0.1)', href: '/admin/products' },
     { label: 'Categories', value: catList.length, icon: Layers, color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', href: '/admin/catalog' },
-    { label: 'Co-Create', value: cocreateProducts, icon: Tag, color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)', href: '/admin/products' },
+    { label: 'Cocreate', value: cocreateProducts, icon: Tag, color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)', href: '/admin/products' },
   ];
 
   const quickActions = [
@@ -193,7 +193,7 @@ export default function AdminDashboard() {
               <div style={{ width: 1, background: 'var(--surface-border)' }} />
               <div style={{ flex: 1, textAlign: 'center' }}>
                 <div style={{ fontSize: 18, fontWeight: 800, color: '#8b5cf6' }}>{cocreateProducts}</div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Co-Create</div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Cocreate</div>
               </div>
             </div>
           )}

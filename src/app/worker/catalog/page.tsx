@@ -69,7 +69,7 @@ export default function WorkerCatalogPage() {
         </div>
         {[
           { value: filterCategory, setter: setFilterCategory, options: categories, prefix: 'Cat' },
-          { value: filterType, setter: setFilterType, options: [['All', 'All Types'], ['cocreate', 'Co-Create'], ['standard', 'Standard']] as [string, string][], prefix: 'Type' },
+          { value: filterType, setter: setFilterType, options: [['All', 'All Types'], ['cocreate', 'Cocreate'], ['standard', 'Standard']] as [string, string][], prefix: 'Type' },
         ].map(({ value, setter, options, prefix }) => (
           <div key={prefix} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--bg-glass)', border: '1px solid var(--surface-border)', padding: '0 12px', borderRadius: 'var(--radius-md)', height: 38 }}>
             <Filter size={13} color="var(--text-muted)" />
@@ -186,7 +186,7 @@ export default function WorkerCatalogPage() {
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
                       <code style={{ fontSize: 11, color: getCategoryColor(viewProduct.category), background: `${getCategoryColor(viewProduct.category)}18`, padding: '2px 8px', borderRadius: 4, fontWeight: 700 }}>{viewProduct.code}</code>
                       <span className={`badge ${statusColor(viewProduct.status)}`} style={{ fontSize: 10 }}>{viewProduct.status}</span>
-                      {viewProduct.isCocreate && <span className="badge badge-accent" style={{ fontSize: 10 }}><Tag size={9} style={{ marginRight: 2 }} />Co-Create</span>}
+                      {viewProduct.isCocreate && <span className="badge badge-accent" style={{ fontSize: 10 }}><Tag size={9} style={{ marginRight: 2 }} />Cocreate</span>}
                     </div>
                   </div>
                   <button onClick={() => setViewProduct(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', flexShrink: 0 }}><X size={20} /></button>
@@ -207,7 +207,7 @@ export default function WorkerCatalogPage() {
                     ['Category', viewProduct.category],
                     ['Short Name', viewProduct.shortName || '—'],
                     ['Size', viewProduct.size ? `${viewProduct.size} ${viewProduct.unit || ''}` : (viewProduct.specifications?.Size || '—')],
-                    ['Type', viewProduct.isCocreate ? 'Co-Create' : 'Standard'],
+                    ['Type', viewProduct.isCocreate ? 'Cocreate' : 'Standard'],
                   ].map(([label, val]) => (
                     <div key={label} style={{ padding: '10px 12px', background: 'var(--bg-primary)', borderRadius: 8, border: '1px solid var(--surface-border)' }}>
                       <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>{label}</div>
