@@ -5,7 +5,7 @@ import { useAppStore } from '@/lib/store';
 import { FileSpreadsheet, Search, Upload, AlertCircle, CheckCircle, Package } from 'lucide-react';
 
 export default function SKUManagementPage() {
-  const { products, fetchData, updateProduct, deleteProduct } = useAppStore();
+  const { products, fetchData, updateProduct, deleteProduct, addProduct } = useAppStore();
   const [search, setSearch] = useState('');
   
   // File Upload State
@@ -48,10 +48,18 @@ export default function SKUManagementPage() {
     }
   };
 
-  // Edit State
+  // Edit & Add State
   const [editingProduct, setEditingProduct] = useState<typeof products[0] | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
   const [editForm, setEditForm] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+
+  const startAdd = () => {
+    setIsAdding(true);
+    setEditForm({
+      code: '', name: '', packagingType: '', bottleType: '', color: '', subcategory: '', cfbSize: '', quantity: '0'
+    });
+  };
 
   const startEdit = (p: typeof products[0]) => {
     setEditingProduct(p);
@@ -68,10 +76,11 @@ export default function SKUManagementPage() {
   };
 
   const handleSaveEdit = async () => {
-    if (!editingProduct) return;
+    if (!isAdding && !editingProduct) return;
+    if (!editForm.code || !editForm.name) return alert('Material Code and Product Name are required');
     setSaving(true);
     try {
-      await updateProduct(editingProduct.id, {
+      const payload = {
         code: editForm.code,
         name: editForm.name,
         packagingType: editForm.packagingType,
@@ -80,10 +89,35 @@ export default function SKUManagementPage() {
         subcategory: editForm.subcategory,
         cfbSize: editForm.cfbSize,
         quantity: parseInt(editForm.quantity) || 0,
-      });
-      setEditingProduct(null);
+      };
+
+      if (isAdding) {
+        await addProduct({
+          id: `Product-${Date.now()}`,
+          ...payload,
+          category: payload.subcategory || 'Uncategorized',
+          tags: [],
+          images: [],
+          image: '',
+          price: 0,
+          stock: payload.quantity,
+          status: 'active',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          createdBy: 'Admin',
+          description: '',
+          notes: '',
+          instructions: '',
+          isCocreate: false,
+          specifications: {}
+        });
+        setIsAdding(false);
+      } else if (editingProduct) {
+        await updateProduct(editingProduct.id, payload);
+        setEditingProduct(null);
+      }
     } catch (err: any) {
-      alert(err.message || 'Error updating SKU');
+      alert(err.message || 'Error saving SKU');
     } finally {
       setSaving(false);
     }
@@ -109,8 +143,12 @@ export default function SKUManagementPage() {
           <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Manage packaging specifications and directly import SKUs.</p>
         </div>
         
-        {/* Quick Upload Button */}
-        <div>
+        {/* Actions */}
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button className="btn-secondary" onClick={startAdd} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            Add SKU
+          </button>
+          
           <input type="file" accept=".csv" ref={fileInputRef} onChange={handleFileUpload} style={{ display: 'none' }} />
           <button 
             className="btn-primary" 
@@ -248,11 +286,13 @@ export default function SKUManagementPage() {
         </table>
       </div>
 
-      {/* Edit Modal */}
-      {editingProduct && (
+      {/* Edit/Add Modal */}
+      {(editingProduct || isAdding) && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card" style={{ width: '100%', maxWidth: 500, padding: 24 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20 }}>Edit SKU: {editingProduct.name}</h2>
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20 }}>
+              {isAdding ? 'Add New SKU' : `Edit SKU: ${editingProduct?.name}`}
+            </h2>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
               <div>
@@ -290,9 +330,9 @@ export default function SKUManagementPage() {
             </div>
 
             <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-              <button className="btn-secondary" onClick={() => setEditingProduct(null)} disabled={saving}>Cancel</button>
+              <button className="btn-secondary" onClick={() => { setEditingProduct(null); setIsAdding(false); }} disabled={saving}>Cancel</button>
               <button className="btn-primary" onClick={handleSaveEdit} disabled={saving}>
-                {saving ? 'Saving...' : 'Save Changes'}
+                {saving ? 'Saving...' : (isAdding ? 'Add SKU' : 'Save Changes')}
               </button>
             </div>
           </motion.div>
