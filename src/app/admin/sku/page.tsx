@@ -48,9 +48,58 @@ export default function SKUManagementPage() {
     }
   };
 
+  // Edit State
+  const [editingProduct, setEditingProduct] = useState<typeof products[0] | null>(null);
+  const [editForm, setEditForm] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+
+  const startEdit = (p: typeof products[0]) => {
+    setEditingProduct(p);
+    setEditForm({
+      code: p.code,
+      brand: p.brand || p.specifications?.Brand || '',
+      packagingType: p.packagingType || p.size || p.specifications?.Size || '',
+      bottleType: p.bottleType || p.specifications?.['Bottle Type'] || '',
+      color: p.color || p.specifications?.Color || '',
+      subcategory: p.subcategory || p.category || '',
+      cfbSize: p.cfbSize || p.specifications?.['CFB Size'] || '',
+      quantity: (p.quantity || p.stock || 0).toString(),
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingProduct) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/products/${editingProduct.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: editForm.code,
+          brand: editForm.brand,
+          packagingType: editForm.packagingType,
+          bottleType: editForm.bottleType,
+          color: editForm.color,
+          subcategory: editForm.subcategory,
+          cfbSize: editForm.cfbSize,
+          quantity: parseInt(editForm.quantity) || 0,
+        })
+      });
+
+      if (!res.ok) throw new Error('Failed to update SKU');
+      
+      await fetchData(); // Refresh data
+      setEditingProduct(null);
+    } catch (err: any) {
+      alert(err.message || 'Error updating SKU');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const filteredProducts = products.filter(p => 
     p.code.toLowerCase().includes(search.toLowerCase()) || 
-    p.brand?.toLowerCase().includes(search.toLowerCase()) ||
+    (p.brand || '').toLowerCase().includes(search.toLowerCase()) ||
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -137,19 +186,19 @@ export default function SKUManagementPage() {
               <th style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-secondary)' }}>Bottle Category</th>
               <th style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-secondary)' }}>CFB Size</th>
               <th style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-secondary)' }}>Qty/CFB</th>
+              <th style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-secondary)', textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredProducts.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
+                <td colSpan={9} style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
                   <Package size={40} style={{ margin: '0 auto 12px', opacity: 0.2 }} />
                   No SKUs found. Try uploading a CSV.
                 </td>
               </tr>
             ) : (
               filteredProducts.map((p, i) => {
-                // Safely extract specifications or fallbacks
                 const packSize = p.packagingType || p.size || p.specifications?.Size || '-';
                 const bottleType = p.bottleType || p.specifications?.['Bottle Type'] || '-';
                 const capColor = p.color || p.specifications?.Color || '-';
@@ -175,6 +224,15 @@ export default function SKUManagementPage() {
                     <td style={{ padding: '14px 20px' }}>{category}</td>
                     <td style={{ padding: '14px 20px' }}>{cfbSize}</td>
                     <td style={{ padding: '14px 20px' }}>{qtyCfb}</td>
+                    <td style={{ padding: '14px 20px', textAlign: 'right' }}>
+                      <button 
+                        onClick={() => startEdit(p)}
+                        className="btn-secondary" 
+                        style={{ padding: '4px 12px', fontSize: 12 }}
+                      >
+                        Edit
+                      </button>
+                    </td>
                   </motion.tr>
                 );
               })
@@ -182,6 +240,57 @@ export default function SKUManagementPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Edit Modal */}
+      {editingProduct && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card" style={{ width: '100%', maxWidth: 500, padding: 24 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20 }}>Edit SKU: {editingProduct.name}</h2>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+              <div>
+                <label className="form-label">Material Code</label>
+                <input type="text" className="form-input" value={editForm.code} onChange={e => setEditForm({...editForm, code: e.target.value})} />
+              </div>
+              <div>
+                <label className="form-label">Brand Name</label>
+                <input type="text" className="form-input" value={editForm.brand} onChange={e => setEditForm({...editForm, brand: e.target.value})} />
+              </div>
+              <div>
+                <label className="form-label">Pack Size</label>
+                <input type="text" className="form-input" value={editForm.packagingType} onChange={e => setEditForm({...editForm, packagingType: e.target.value})} />
+              </div>
+              <div>
+                <label className="form-label">Bottle Type</label>
+                <input type="text" className="form-input" value={editForm.bottleType} onChange={e => setEditForm({...editForm, bottleType: e.target.value})} />
+              </div>
+              <div>
+                <label className="form-label">Cap Colour</label>
+                <input type="text" className="form-input" value={editForm.color} onChange={e => setEditForm({...editForm, color: e.target.value})} />
+              </div>
+              <div>
+                <label className="form-label">Bottle Category</label>
+                <input type="text" className="form-input" value={editForm.subcategory} onChange={e => setEditForm({...editForm, subcategory: e.target.value})} />
+              </div>
+              <div>
+                <label className="form-label">CFB Size</label>
+                <input type="text" className="form-input" value={editForm.cfbSize} onChange={e => setEditForm({...editForm, cfbSize: e.target.value})} />
+              </div>
+              <div>
+                <label className="form-label">Qty/CFB</label>
+                <input type="number" className="form-input" value={editForm.quantity} onChange={e => setEditForm({...editForm, quantity: e.target.value})} />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+              <button className="btn-secondary" onClick={() => setEditingProduct(null)} disabled={saving}>Cancel</button>
+              <button className="btn-primary" onClick={handleSaveEdit} disabled={saving}>
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
