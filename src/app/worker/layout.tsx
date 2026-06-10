@@ -3,14 +3,15 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
-import { Home, Camera, Grid3X3, User, ArrowRight, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Camera, FileSpreadsheet, Package, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
 const navItems = [
-  { href: '/worker', label: 'Home', icon: Home },
-  { href: '/worker/scan', label: 'Scan', icon: Camera },
-  { href: '/worker/catalog', label: 'Products', icon: Grid3X3 },
-  { href: '/worker/manual', label: 'Manual', icon: BookOpen },
+  { href: '/worker', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/worker/scan', label: 'AI Scan', icon: Camera },
+  { href: '/worker/sku', label: 'Product SKUs', icon: FileSpreadsheet },
+  { href: '/worker/catalog', label: 'Catalog', icon: Package },
+  { href: '/worker/manual', label: 'SOP Manual', icon: BookOpen },
 ];
 
 export default function WorkerLayout({ children }: { children: React.ReactNode }) {

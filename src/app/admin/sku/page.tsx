@@ -72,7 +72,7 @@ export default function SKUManagementPage() {
     setSaving(true);
     try {
       const res = await fetch(`/api/products/${editingProduct.id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code: editForm.code,
