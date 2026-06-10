@@ -69,9 +69,23 @@ const LandingContentSchema = new mongoose.Schema({
   founderName: String,
   founderTitle: String,
 });
-
 export const LandingContentModel = mongoose.models.LandingContent || mongoose.model('LandingContent', LandingContentSchema);
 
+const LoginContentSchema = new mongoose.Schema({
+  id: { type: String, default: 'login_singleton', unique: true },
+  title: { type: String, default: 'Welcome Back' },
+  subtitle: { type: String, default: 'Sign in to access your workspace.' },
+  adminTabLabel: { type: String, default: 'Admin Login' },
+  workerTabLabel: { type: String, default: 'Worker Access' },
+});
+export const LoginContentModel = mongoose.models.LoginContent || mongoose.model('LoginContent', LoginContentSchema);
+const ManualSchema = new mongoose.Schema({
+  id: { type: String, default: 'manual_singleton', unique: true },
+  html: { type: String, default: '' },
+  fileName: { type: String, default: '' },
+  updatedAt: { type: String, default: () => new Date().toISOString() }
+});
+export const ManualModel = mongoose.models.Manual || mongoose.model('Manual', ManualSchema);
 // ─── CONNECTION ──────────────────────────────────────────────────────────────
 
 let cached = (global as any)._mongoose;
@@ -113,7 +127,14 @@ const defaultLandingContent: LandingContent = {
   founderTitle: "Founder & Product Lead · PackVision AI"
 };
 
-const defaultData = { products: [] as Product[], activityLogs: [] as ActivityLog[], recognitionLogs: [] as RecognitionLog[], questions: [] as Question[], landingContent: defaultLandingContent };
+const defaultLoginContent = {
+  title: 'Welcome Back',
+  subtitle: 'Sign in to access your workspace.',
+  adminTabLabel: 'Admin Login',
+  workerTabLabel: 'Worker Access',
+};
+
+const defaultData = { products: [] as Product[], activityLogs: [] as ActivityLog[], recognitionLogs: [] as RecognitionLog[], questions: [] as Question[], landingContent: defaultLandingContent, loginContent: defaultLoginContent };
 
 async function readJson() {
   try {
@@ -148,9 +169,15 @@ export interface DbHelpers {
   getLandingContent(): Promise<LandingContent>;
   updateLandingContent(content: LandingContent): Promise<void>;
 
+  getLoginContent(): Promise<any>;
+  updateLoginContent(content: any): Promise<void>;
+
   getQuestions(): Promise<Question[]>;
   insertQuestion(q: Question): Promise<void>;
   updateQuestion(id: string, updates: Partial<Question>): Promise<Question | null>;
+
+  getManual(): Promise<{ html: string; fileName: string } | null>;
+  updateManual(html: string, fileName: string): Promise<void>;
 }
 
 function stripMongo(doc: any): any {
@@ -229,6 +256,32 @@ export async function getDb(): Promise<DbHelpers> {
       async updateQuestion(id, updates) {
         const doc = await QuestionModel.findOneAndUpdate({ id }, updates, { new: true }).lean();
         return doc ? stripMongo(doc) : null;
+      },
+      async getManual() {
+        const doc = await ManualModel.findOne({ id: 'manual_singleton' }).lean();
+        return doc ? { html: doc.html, fileName: doc.fileName } : null;
+      },
+      async updateManual(html, fileName) {
+        await ManualModel.findOneAndUpdate(
+          { id: 'manual_singleton' },
+          { html, fileName, updatedAt: new Date().toISOString() },
+          { upsert: true }
+        );
+      },
+      async getLoginContent() {
+        const doc = await LoginContentModel.findOne({ id: 'login_singleton' }).lean();
+        if (!doc) {
+          await LoginContentModel.create({ id: 'login_singleton', ...defaultLoginContent });
+          return defaultLoginContent;
+        }
+        return stripMongo(doc);
+      },
+      async updateLoginContent(content) {
+        await LoginContentModel.findOneAndUpdate(
+          { id: 'login_singleton' },
+          { ...content },
+          { upsert: true, new: true }
+        );
       },
     };
   } else {
@@ -328,6 +381,24 @@ export async function getDb(): Promise<DbHelpers> {
         db.questions[idx] = { ...db.questions[idx], ...updates };
         await writeJson(db);
         return db.questions[idx];
+      },
+      async getManual() {
+        const db = await readJson();
+        return db.manual || null;
+      },
+      async updateManual(html, fileName) {
+        const db = await readJson();
+        db.manual = { html, fileName, updatedAt: new Date().toISOString() };
+        await writeJson(db);
+      },
+      async getLoginContent() {
+        const db = await readJson();
+        return db.loginContent || defaultLoginContent;
+      },
+      async updateLoginContent(content) {
+        const db = await readJson();
+        db.loginContent = content;
+        await writeJson(db);
       },
     };
   }

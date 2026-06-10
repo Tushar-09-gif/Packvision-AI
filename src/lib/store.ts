@@ -1,7 +1,8 @@
 'use client';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Product, User, ActivityLog, RecognitionLog, LandingContent, Question } from '@/types';
+import { Product, User, ActivityLog, RecognitionLog, LandingContent, Question, LoginContent } from '@/types';
+import DOMPurify from 'isomorphic-dompurify';
 
 interface AppState {
   user: User | null;
@@ -10,6 +11,7 @@ interface AppState {
   recognitionLogs: RecognitionLog[];
   questions: Question[];
   landingContent: LandingContent | null;
+  loginContent: LoginContent | null;
   theme: 'dark' | 'light';
   sidebarOpen: boolean;
   manualHtml: string | null;
@@ -23,6 +25,7 @@ interface AppState {
   
   // API actions
   fetchData: () => Promise<void>;
+  fetchManual: () => Promise<void>;
   addProduct: (product: Product) => Promise<void>;
   updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
@@ -30,6 +33,8 @@ interface AppState {
   addRecognitionLog: (log: RecognitionLog) => Promise<void>;
   fetchLandingContent: () => Promise<void>;
   updateLandingContent: (content: LandingContent) => Promise<void>;
+  fetchLoginContent: () => Promise<void>;
+  updateLoginContent: (content: LoginContent) => Promise<void>;
   addQuestion: (q: Question) => Promise<void>;
   answerQuestion: (id: string, answer: string) => Promise<void>;
 }
@@ -43,6 +48,7 @@ export const useAppStore = create<AppState>()(
       recognitionLogs: [],
       questions: [],
       landingContent: null,
+      loginContent: null,
       theme: 'dark',
       sidebarOpen: true,
       manualHtml: null,
@@ -52,7 +58,21 @@ export const useAppStore = create<AppState>()(
       setTheme: (theme) => set({ theme }),
       toggleTheme: () => set((s) => ({ theme: s.theme === 'dark' ? 'light' : 'dark' })),
       setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
-      setManual: (manualHtml, manualFileName) => set({ manualHtml, manualFileName }),
+      setManual: async (html, manualFileName) => {
+        const cleanHtml = html ? DOMPurify.sanitize(html) : null;
+        set({ manualHtml: cleanHtml, manualFileName });
+        try {
+          if (cleanHtml && manualFileName) {
+            await fetch('/api/manual', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ html: cleanHtml, fileName: manualFileName })
+            });
+          }
+        } catch (e) {
+          console.error('Failed to sync manual', e);
+        }
+      },
 
       fetchData: async () => {
         try {
@@ -66,12 +86,27 @@ export const useAppStore = create<AppState>()(
           set({
             // API returns { products: [...], total, page, limit }
             products: Array.isArray(productsRes) ? productsRes : (productsRes?.products || []),
-            activityLogs: Array.isArray(activityRes) ? activityRes : (activityRes?.activityLogs || activityRes || []),
-            recognitionLogs: Array.isArray(recognitionRes) ? recognitionRes : (recognitionRes?.recognitionLogs || recognitionRes || []),
+            activityLogs: Array.isArray(activityRes) ? activityRes : (activityRes?.activityLogs || []),
+            recognitionLogs: Array.isArray(recognitionRes) ? recognitionRes : (recognitionRes?.recognitionLogs || []),
             questions: Array.isArray(questionsRes) ? questionsRes : (questionsRes?.questions || []),
           });
+          get().fetchManual();
         } catch (error) {
           console.error("Failed to fetch data:", error);
+        }
+      },
+
+      fetchManual: async () => {
+        try {
+          const res = await fetch('/api/manual').then(r => r.json());
+          if (res.success && res.manual) {
+            set({ 
+              manualHtml: res.manual.html ? DOMPurify.sanitize(res.manual.html) : null,
+              manualFileName: res.manual.fileName
+            });
+          }
+        } catch (error) {
+          console.error("Failed to fetch manual:", error);
         }
       },
 
@@ -186,6 +221,28 @@ export const useAppStore = create<AppState>()(
           console.error("Failed to update landing content:", error);
         }
       },
+      fetchLoginContent: async () => {
+        try {
+          const res = await fetch('/api/settings/login').then(r => r.json());
+          set({ loginContent: res });
+        } catch (error) {
+          console.error("Failed to fetch login content:", error);
+        }
+      },
+      updateLoginContent: async (content) => {
+        try {
+          const res = await fetch('/api/settings/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(content),
+          }).then(r => r.json());
+          if (res.success) {
+            set({ loginContent: content });
+          }
+        } catch (error) {
+          console.error("Failed to update login content:", error);
+        }
+      },
       addQuestion: async (q) => {
         try {
           await fetch('/api/questions', {
@@ -222,8 +279,6 @@ export const useAppStore = create<AppState>()(
       partialize: (s) => ({
         user: s.user,
         theme: s.theme,
-        manualHtml: s.manualHtml,
-        manualFileName: s.manualFileName,
       }),
     }
   )

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const db = await getDb();
-    const content = await db.getLandingContent();
+    const content = await db.getLoginContent();
     return NextResponse.json(content);
   } catch (error) {
     return NextResponse.json({ success: false }, { status: 500 });
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     await requireAuth(['admin']);
     const db = await getDb();
     const content = await req.json();
-    await db.updateLandingContent(content);
+    await db.updateLoginContent(content);
     return NextResponse.json({ success: true, content });
   } catch (error) {
     return NextResponse.json({ success: false }, { status: 500 });

@@ -75,6 +75,12 @@ export interface LandingContent {
   founderTitle: string;
 }
 
+export interface LoginContent {
+  title: string;
+  subtitle: string;
+  adminTabLabel: string;
+  workerTabLabel: string;
+}
 export interface DashboardStats {
   totalProducts: number;
   activeProducts: number;

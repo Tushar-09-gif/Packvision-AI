@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { requireAuth } from '@/lib/auth';
 import { Product } from '@/types';
 
 export const dynamic = 'force-dynamic';
@@ -40,6 +41,7 @@ function parseCSVLine(line: string): string[] {
 
 export async function POST(req: Request) {
   try {
+    await requireAuth(['admin']);
     const formData = await req.formData();
     const file = formData.get('file') as File;
     

@@ -5,7 +5,7 @@ import { Save, Loader2, LayoutTemplate, Type, Quote, Hash } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 
 export default function PageEditor() {
-  const { landingContent, updateLandingContent } = useAppStore();
+  const { landingContent, updateLandingContent, loginContent, updateLoginContent } = useAppStore();
   const [saving, setSaving] = useState(false);
   
   // Local state for editing
@@ -24,14 +24,24 @@ export default function PageEditor() {
     founderTitle: "Founder & Product Lead · PackVision AI"
   });
 
+  const [loginContentState, setLoginContentState] = useState(loginContent || {
+    title: 'Welcome Back',
+    subtitle: 'Sign in to access your workspace.',
+    adminTabLabel: 'Admin Login',
+    workerTabLabel: 'Worker Access',
+  });
+
   useEffect(() => {
-    if (landingContent) {
-      setContent(landingContent);
-    }
-  }, [landingContent]);
+    if (landingContent) setContent(landingContent);
+    if (loginContent) setLoginContentState(loginContent);
+  }, [landingContent, loginContent]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setContent(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoginContentState(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleStatChange = (index: number, field: 'val' | 'label', value: string) => {
@@ -42,15 +52,18 @@ export default function PageEditor() {
 
   const handleSave = async () => {
     setSaving(true);
-    await updateLandingContent(content);
+    await Promise.all([
+      updateLandingContent(content),
+      updateLoginContent(loginContentState)
+    ]);
     setTimeout(() => setSaving(false), 800);
   };
 
   return (
     <div style={{ maxWidth: 800 }}>
       <div style={{ marginBottom: 32 }}>
-        <h1 className="page-title">Landing Page Editor</h1>
-        <p className="page-subtitle">Customize the content shown on the public landing page.</p>
+        <h1 className="page-title">Page Content Editor</h1>
+        <p className="page-subtitle">Customize the text shown on the public landing page and login page.</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -117,6 +130,36 @@ export default function PageEditor() {
               <div>
                 <label style={{ display: 'block', fontSize: 13, marginBottom: 8, color: 'var(--text-secondary)' }}>Title / Role</label>
                 <input name="founderTitle" value={content.founderTitle} onChange={handleChange} className="form-input" placeholder="e.g. CEO at Company" />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* LOGIN PAGE SECTION */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card" style={{ padding: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, color: 'var(--brand)', fontWeight: 600 }}>
+            <Type size={18} /> Login Page Text
+          </div>
+          
+          <div style={{ display: 'grid', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, marginBottom: 8, color: 'var(--text-secondary)' }}>Login Title</label>
+                <input name="title" value={loginContentState.title} onChange={handleLoginChange} className="form-input" placeholder="Welcome back" />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, marginBottom: 8, color: 'var(--text-secondary)' }}>Login Subtitle</label>
+                <input name="subtitle" value={loginContentState.subtitle} onChange={handleLoginChange} className="form-input" placeholder="Sign in..." />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, marginBottom: 8, color: 'var(--text-secondary)' }}>Admin Tab Label</label>
+                <input name="adminTabLabel" value={loginContentState.adminTabLabel} onChange={handleLoginChange} className="form-input" placeholder="Admin Login" />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, marginBottom: 8, color: 'var(--text-secondary)' }}>Worker Tab Label</label>
+                <input name="workerTabLabel" value={loginContentState.workerTabLabel} onChange={handleLoginChange} className="form-input" placeholder="Worker Access" />
               </div>
             </div>
           </div>

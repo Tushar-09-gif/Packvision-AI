@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, HardHat, ArrowRight, Eye, EyeOff, Zap, AlertCircle, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,7 @@ const ADMIN_PASSWORD = 'packvisionai@123';
 export default function LoginPage() {
   const router = useRouter();
   const setUser = useAppStore((s) => s.setUser);
+  const { loginContent, fetchLoginContent } = useAppStore();
   const [tab, setTab] = useState<'admin' | 'worker'>('admin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,14 +20,33 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    fetchLoginContent();
+  }, [fetchLoginContent]);
+
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 700));
     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      setUser({ id: 'U-001', name: 'Tushar Makwana', role: 'admin', avatar: 'T', email });
-      router.push('/admin');
+      try {
+        const payload = { id: 'U-001', name: 'Tushar Makwana', role: 'admin', avatar: 'T', email };
+        await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify(payload) });
+        setUser(payload as any);
+        useAppStore.getState().addActivityLog({
+          id: `AL-${Date.now()}`,
+          userId: payload.id,
+          userName: payload.name,
+          action: 'logged in to',
+          target: 'Admin Panel',
+          timestamp: new Date().toISOString(),
+          type: 'login',
+        });
+        router.push('/admin');
+      } catch (err) {
+        setError('Server error during login.');
+        setLoading(false);
+      }
     } else {
       setError('Invalid email or password.');
       setLoading(false);
@@ -38,10 +58,25 @@ export default function LoginPage() {
     setError('');
     if (!workerName.trim()) { setError('Please enter your name.'); return; }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 500));
-    const initials = workerName.trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-    setUser({ id: `W-${Date.now()}`, name: workerName.trim(), role: 'worker', avatar: initials, email: '' });
-    router.push('/worker');
+    try {
+      const initials = workerName.trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      const payload = { id: `W-${Date.now()}`, name: workerName.trim(), role: 'worker', avatar: initials, email: '' };
+      await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify(payload) });
+      setUser(payload as any);
+      useAppStore.getState().addActivityLog({
+        id: `AL-${Date.now()}`,
+        userId: payload.id,
+        userName: payload.name,
+        action: 'logged in to',
+        target: 'Worker Panel',
+        timestamp: new Date().toISOString(),
+        type: 'login',
+      });
+      router.push('/worker');
+    } catch (err) {
+      setError('Server error during login.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,10 +95,10 @@ export default function LoginPage() {
           </div>
 
           <h1 style={{ fontSize: 'clamp(22px,4vw,32px)', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 6 }}>
-            Welcome back
+            {loginContent?.title || 'Welcome back'}
           </h1>
           <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 28 }}>
-            Sign in to access the Product Management System
+            {loginContent?.subtitle || 'Sign in to access the Product Management System'}
           </p>
 
           {/* Tabs */}
@@ -76,7 +111,7 @@ export default function LoginPage() {
                   boxShadow: tab === t ? 'var(--shadow-sm)' : 'none',
                 }}>
                 {t === 'admin' ? <Shield size={14} /> : <HardHat size={14} />}
-                {t === 'admin' ? 'Admin' : 'Employee'}
+                {t === 'admin' ? (loginContent?.adminTabLabel || 'Admin') : (loginContent?.workerTabLabel || 'Employee')}
               </button>
             ))}
           </div>

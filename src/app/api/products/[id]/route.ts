@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { requireAuth } from '@/lib/auth';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    await requireAuth(['admin']);
     const db = await getDb();
     const { id } = await params;
     const updates = await req.json();
@@ -16,6 +18,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    await requireAuth(['admin']);
     const db = await getDb();
     const { id } = await params;
     await db.deleteProduct(id);

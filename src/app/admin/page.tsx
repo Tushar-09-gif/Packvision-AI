@@ -33,8 +33,6 @@ export default function AdminDashboard() {
   const { products, activityLogs, user, fetchData, updateProduct } = useAppStore();
   const [renaming, setRenaming] = useState(false);
 
-  useEffect(() => { fetchData(); }, []);
-
   const handleRenameCategory = async (oldName: string, newName: string) => {
     setRenaming(true);
     const targets = products.filter(p => p.category === oldName);

@@ -42,7 +42,7 @@ const navItems = navGroups.flatMap(g => g.items);
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, theme, toggleTheme, setUser } = useAppStore();
+  const { user, theme, toggleTheme, setUser, fetchData } = useAppStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Close sidebar on route change
@@ -77,9 +77,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (authChecked) {
       if (!user || user.role !== 'admin') {
         router.replace('/login');
+      } else {
+        fetchData();
       }
     }
-  }, [authChecked, user, router]);
+  }, [authChecked, user, router, fetchData]);
 
   if (!mounted || !authChecked) return null; // Wait for full hydration
   if (!user || user.role !== 'admin') return null;

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { requireAuth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    await requireAuth();
     const db = await getDb();
     const log = await req.json();
     await db.insertActivityLog(log);
