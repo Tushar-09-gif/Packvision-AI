@@ -22,6 +22,9 @@ function mapCSVHeaderToField(header: string): string {
   if (['bottletype', 'bottle', 'packaging', 'bottletypepethdpealucoex'].includes(h) || h.includes('bottle')) return 'bottleType';
   if (['labelsize', 'labeltype', 'label'].includes(h) || h.includes('label')) return 'labelSize';
   if (['cfbsize', 'cfb'].includes(h) || h.includes('cfb')) return 'cfbSize';
+  if (['packsize', 'pack', 'packagingtype'].includes(h) || h.includes('pack')) return 'packagingType';
+  if (['capcolour', 'color', 'capcolor', 'cap'].includes(h) || h.includes('color') || h.includes('cap')) return 'color';
+  if (['bottlecategory', 'subcategory', 'subcat'].includes(h) || h.includes('subcat')) return 'subcategory';
   return h;
 }
 
@@ -125,6 +128,9 @@ export async function POST(req: Request) {
           bottleType: row.bottleType,
           labelSize: row.labelSize,
           cfbSize: row.cfbSize,
+          packagingType: row.packagingType,
+          color: row.color,
+          subcategory: row.subcategory,
         };
 
         imported.push(product);

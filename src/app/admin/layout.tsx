@@ -20,8 +20,8 @@ const navGroups = [
     items: [
       { href: '/admin/products', label: 'All Products', icon: Package },
       { href: '/admin/catalog', label: 'Catalog View', icon: Grid3X3 },
+      { href: '/admin/sku', label: 'SKU Management', icon: FileSpreadsheet },
       { href: '/admin/upload', label: 'Add Product', icon: Upload },
-      { href: '/admin/import', label: 'CSV Import', icon: FileSpreadsheet },
     ],
   },
   {
